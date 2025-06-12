@@ -1,7 +1,9 @@
 public class Main {
 	public static void main(String[] args) {
-		Grapher g = new Grapher();		
+		Plotter p = new Plotter();
 
-		g.showGraph();
+		//p.addPoint(0, 0, 0);
+		//p.addPoint(100, 100, 1);
+		//p.addPoint(50, 50, 2);
 	}
 }
