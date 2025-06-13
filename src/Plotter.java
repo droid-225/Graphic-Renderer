@@ -6,11 +6,15 @@ import java.util.Map;
 
 public class Plotter extends JPanel {
     HashMap<Integer, Coordinate> points = new HashMap<>();
-    int size;
+    int winWidth;
+    int winHeight;
 
-    public Plotter() {
+    public Plotter(int width, int height) {
+        winWidth = width;
+        winHeight = height;
+
         JFrame frame = new JFrame("Plot");
-        frame.setSize(500, 500);
+        frame.setSize(winWidth, winHeight);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.add(this);
         frame.setLocationRelativeTo(null);
@@ -38,5 +42,10 @@ public class Plotter extends JPanel {
         g.setColor(Color.BLACK);
         for(Map.Entry<Integer, Coordinate> entry: points.entrySet())
             g.fillRect(entry.getValue().xPos, entry.getValue().yPos, 10, 10);
+
+        g.fillRect(1, 1, 1, 500);
+        g.fillRect(1, 1, 500, 1);
+        g.fillRect(500, 1, 1, 500);
+        g.fillRect(1, 500, 500, 1);
     }
 }
