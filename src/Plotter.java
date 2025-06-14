@@ -1,6 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,17 +7,14 @@ public class Plotter extends JPanel {
     HashMap<Integer, Coordinate> points = new HashMap<>();
     int winWidth;
     int winHeight;
+    boolean isMoving = false;
 
     public Plotter(int width, int height) {
         winWidth = width;
         winHeight = height;
 
-        JFrame frame = new JFrame("Plot");
-        frame.setSize(winWidth, winHeight);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.add(this);
-        frame.setLocationRelativeTo(null);
-        frame.setVisible(true);
+        setBackground(Color.WHITE);
+        setPreferredSize(new Dimension(width, height));
     }
 
     public void addPoint(int xPos, int yPos, int id) {
@@ -35,17 +31,39 @@ public class Plotter extends JPanel {
         }
     }
 
+    public void startMovement() {
+        isMoving = true;
+        Thread movementThread = new Thread(() -> {
+            try {
+                while (isMoving && points.get(0).yPos < 490) {
+                    SwingUtilities.invokeLater(() -> {
+                        points.put(0, new Coordinate(points.get(0).xPos, points.get(0).yPos + 10));
+                        repaint();
+                    });
+                    Thread.sleep(100);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        movementThread.start();
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
         g.setColor(Color.BLACK);
-        for(Map.Entry<Integer, Coordinate> entry: points.entrySet())
-            g.fillRect(entry.getValue().xPos, entry.getValue().yPos, 10, 10);
+        //for(Map.Entry<Integer, Coordinate> entry: points.entrySet())
+        g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
 
-        g.fillRect(1, 1, 1, 500);
-        g.fillRect(1, 1, 500, 1);
-        g.fillRect(500, 1, 1, 500);
-        g.fillRect(1, 500, 500, 1);
+        drawBoundingBox(g, new Coordinate(1,1), 500, 500);
+    }
+
+    public void drawBoundingBox(Graphics g, Coordinate startCoords, int width, int height) {
+        g.fillRect(startCoords.xPos, startCoords.yPos, 1, height);
+        g.fillRect(startCoords.xPos, startCoords.yPos, width, 1);
+        g.fillRect(width, startCoords.yPos, 1, height);
+        g.fillRect(startCoords.xPos, height, width, 1);
     }
 }
