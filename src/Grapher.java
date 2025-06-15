@@ -1,3 +1,5 @@
+import GameEngine.Coordinate;
+
 import java.util.HashMap;
 import java.util.Map;
 

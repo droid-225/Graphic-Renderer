@@ -1,3 +1,5 @@
+import GameEngine.Coordinate;
+
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashMap;
@@ -54,7 +56,7 @@ public class Plotter extends JPanel {
         super.paintComponent(g);
 
         g.setColor(Color.BLACK);
-        //for(Map.Entry<Integer, Coordinate> entry: points.entrySet())
+        //for(Map.Entry<Integer, GameEngine.Coordinate> entry: points.entrySet())
         g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
 
         drawBoundingBox(g, new Coordinate(1,1), 500, 500);
