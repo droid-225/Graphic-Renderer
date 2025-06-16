@@ -1,10 +1,9 @@
 package GameEngine;
 
 import javax.swing.*;
-import java.awt.*;
 
 public class GameHandler {
-    public static void startGame() {
+    public void startGame() {
         SwingUtilities.invokeLater(() -> {
             JFrame frame = new JFrame("Game");
             GameWindow window = new GameWindow(510, 510);

@@ -11,47 +11,43 @@ public class GameWindow extends JPanel {
     HashMap<Integer, Coordinate> points = new HashMap<>();
     boolean isMoving = false;
     final int MOVE_SPEED = 10;
+    int width, height;
 
     public GameWindow(int width, int height) {
+        this.width = width;
+        this.height = height;
         setBackground(Color.WHITE);
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
 
+        addController(0);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+
+        g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
+
+        //drawBoundingBox(g,new Coordinate(5, 5), 500, 500);
+    }
+
+    public void addController(int entityID) {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                Coordinate current = points.get(0);
-                Coordinate newPos = null;
-
-                switch(e.getKeyCode()) {
-                    case KeyEvent.VK_LEFT:
-                        newPos = new Coordinate(
-                                Math.max(0, current.xPos - MOVE_SPEED),
-                                current.yPos
-                        );
-                        break;
-                    case KeyEvent.VK_RIGHT:
-                        newPos = new Coordinate(
-                                Math.min(width - 10, current.xPos + MOVE_SPEED),
-                                current.yPos
-                        );
-                        break;
-                    case KeyEvent.VK_UP:
-                        newPos = new Coordinate(
-                                current.xPos,
-                                Math.max(0, current.yPos - MOVE_SPEED)
-                        );
-                        break;
-                    case KeyEvent.VK_DOWN:
-                        newPos = new Coordinate(
-                                current.xPos,
-                                Math.min(height - 10, current.yPos + MOVE_SPEED)
-                        );
-                        break;
-                }
+                Coordinate entity = points.get(entityID);
+                Coordinate newPos = switch (e.getKeyCode()) {
+                    case KeyEvent.VK_LEFT -> new Coordinate(Math.max(0, entity.xPos - MOVE_SPEED), entity.yPos);
+                    case KeyEvent.VK_RIGHT -> new Coordinate(Math.min(width - 10, entity.xPos + MOVE_SPEED), entity.yPos);
+                    case KeyEvent.VK_UP -> new Coordinate(entity.xPos, Math.max(0, entity.yPos - MOVE_SPEED));
+                    case KeyEvent.VK_DOWN -> new Coordinate(entity.xPos, Math.min(height - 10, entity.yPos + MOVE_SPEED));
+                    default -> null;
+                };
 
                 if (newPos != null) {
-                    points.put(0, newPos);
+                    points.put(entityID, newPos);
+                    getPointData();
                     repaint();
                 }
             }
@@ -70,15 +66,6 @@ public class GameWindow extends JPanel {
 
             System.out.println("ID: " + id + "\tCoordinates: " + coord);
         }
-    }
-
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-
-        g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
-
-        drawBoundingBox(g,new Coordinate(5, 5), 500, 500);
     }
 
     public void drawBoundingBox(Graphics g, Coordinate startCoords, int width, int height) {
