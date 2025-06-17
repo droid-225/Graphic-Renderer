@@ -1,8 +1,7 @@
 package GameEngine;
 
 public class Coordinate {
-    public int xPos;
-    public int yPos;
+    private int xPos, yPos;
 
     public Coordinate(int xPos, int yPos) {
         this.xPos = xPos;
@@ -12,4 +11,10 @@ public class Coordinate {
     public String toString() {
         return "(" + xPos + "," + yPos + ")";
     }
+
+    public int getXPos() {return xPos;}
+    public void setXPos(int newXPos) {xPos = newXPos;}
+
+    public int getYPos() {return yPos;}
+    public void setYPos(int newYPos) {yPos = newYPos;}
 }

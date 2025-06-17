@@ -37,9 +37,9 @@ public class Plotter extends JPanel {
         isMoving = true;
         Thread movementThread = new Thread(() -> {
             try {
-                while (isMoving && points.get(0).yPos < 490) {
+                while (isMoving && points.get(0).getYPos() < 490) {
                     SwingUtilities.invokeLater(() -> {
-                        points.put(0, new Coordinate(points.get(0).xPos, points.get(0).yPos + 10));
+                        points.put(0, new Coordinate(points.get(0).getXPos(), points.get(0).getYPos() + 10));
                         repaint();
                     });
                     Thread.sleep(100);
@@ -57,15 +57,15 @@ public class Plotter extends JPanel {
 
         g.setColor(Color.BLACK);
         //for(Map.Entry<Integer, GameEngine.Coordinate> entry: points.entrySet())
-        g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
+        g.fillRect(points.get(0).getXPos(), points.get(0).getYPos(), 10, 10);
 
         drawBoundingBox(g, new Coordinate(1,1), 500, 500);
     }
 
     public void drawBoundingBox(Graphics g, Coordinate startCoords, int width, int height) {
-        g.fillRect(startCoords.xPos, startCoords.yPos, 1, height);
-        g.fillRect(startCoords.xPos, startCoords.yPos, width, 1);
-        g.fillRect(width, startCoords.yPos, 1, height);
-        g.fillRect(startCoords.xPos, height, width, 1);
+        g.fillRect(startCoords.getXPos(), startCoords.getYPos(), 1, height);
+        g.fillRect(startCoords.getXPos(), startCoords.getYPos(), width, 1);
+        g.fillRect(width, startCoords.getYPos(), 1, height);
+        g.fillRect(startCoords.getXPos(), height, width, 1);
     }
 }

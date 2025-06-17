@@ -8,7 +8,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameWindow extends JPanel {
-    HashMap<Integer, Coordinate> points = new HashMap<>();
+    HashMap<Integer, Coordinate> players = new HashMap<>();
+    HashMap<Integer, Coordinate> others = new HashMap<>();
+    HashMap<Integer, Coordinate> Obstacle = new HashMap<>();
     boolean isMoving = false;
     final int MOVE_SPEED = 10;
     int width, height;
@@ -27,7 +29,7 @@ public class GameWindow extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
 
-        g.fillRect(points.get(0).xPos, points.get(0).yPos, 10, 10);
+        g.fillRect(players.get(0).getXPos(), players.get(0).getYPos(), 10, 10);
 
         //drawBoundingBox(g,new Coordinate(5, 5), 500, 500);
     }
@@ -36,17 +38,17 @@ public class GameWindow extends JPanel {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                Coordinate entity = points.get(entityID);
+                Coordinate entity = players.get(entityID);
                 Coordinate newPos = switch (e.getKeyCode()) {
-                    case KeyEvent.VK_LEFT -> new Coordinate(Math.max(0, entity.xPos - MOVE_SPEED), entity.yPos);
-                    case KeyEvent.VK_RIGHT -> new Coordinate(Math.min(width - 10, entity.xPos + MOVE_SPEED), entity.yPos);
-                    case KeyEvent.VK_UP -> new Coordinate(entity.xPos, Math.max(0, entity.yPos - MOVE_SPEED));
-                    case KeyEvent.VK_DOWN -> new Coordinate(entity.xPos, Math.min(height - 10, entity.yPos + MOVE_SPEED));
+                    case KeyEvent.VK_LEFT -> new Coordinate(Math.max(0, entity.getXPos() - MOVE_SPEED), entity.getYPos());
+                    case KeyEvent.VK_RIGHT -> new Coordinate(Math.min(width - 10, entity.getXPos() + MOVE_SPEED), entity.getYPos());
+                    case KeyEvent.VK_UP -> new Coordinate(entity.getXPos(), Math.max(0, entity.getYPos() - MOVE_SPEED));
+                    case KeyEvent.VK_DOWN -> new Coordinate(entity.getXPos(), Math.min(height - 10, entity.getYPos() + MOVE_SPEED));
                     default -> null;
                 };
 
                 if (newPos != null) {
-                    points.put(entityID, newPos);
+                    players.put(entityID, newPos);
                     getPointData();
                     repaint();
                 }
@@ -56,11 +58,11 @@ public class GameWindow extends JPanel {
 
     public void addPoint(int xPos, int yPos, int id) {
         Coordinate coords = new Coordinate(xPos, yPos);
-        points.put(id, coords);
+        players.put(id, coords);
     }
 
     public void getPointData() {
-        for (Map.Entry<Integer, Coordinate> entry : points.entrySet()) {
+        for (Map.Entry<Integer, Coordinate> entry : players.entrySet()) {
             Integer id = entry.getKey();
             Coordinate coord = entry.getValue();
 
@@ -69,19 +71,19 @@ public class GameWindow extends JPanel {
     }
 
     public void drawBoundingBox(Graphics g, Coordinate startCoords, int width, int height) {
-        g.fillRect(startCoords.xPos, startCoords.yPos, 1, height);
-        g.fillRect(startCoords.xPos, startCoords.yPos, width, 1);
-        g.fillRect(width + startCoords.xPos, startCoords.yPos, 1, height);
-        g.fillRect(startCoords.xPos, height + startCoords.yPos, width, 1);
+        g.fillRect(startCoords.getXPos(), startCoords.getYPos(), 1, height);
+        g.fillRect(startCoords.getXPos(), startCoords.getYPos(), width, 1);
+        g.fillRect(width + startCoords.getXPos(), startCoords.getYPos(), 1, height);
+        g.fillRect(startCoords.getXPos(), height + startCoords.getYPos(), width, 1);
     }
 
     public void startMovement() {
         isMoving = true;
         Thread movementThread = new Thread(() -> {
             try {
-                while (isMoving && points.get(0).yPos < 490) {
+                while (isMoving && players.get(0).getYPos() < 490) {
                     SwingUtilities.invokeLater(() -> {
-                        points.put(0, new Coordinate(points.get(0).xPos, points.get(0).yPos + 10));
+                        players.put(0, new Coordinate(players.get(0).getXPos(), players.get(0).getYPos() + 10));
                         repaint();
                     });
                     Thread.sleep(100);

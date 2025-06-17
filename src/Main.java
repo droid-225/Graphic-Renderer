@@ -1,3 +1,5 @@
+import GameEngine.Coordinate;
+import GameEngine.Entities.Player;
 import GameEngine.GameHandler;
 
 public class Main {

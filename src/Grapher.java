@@ -34,7 +34,7 @@ public class Grapher {
 
 	public void addPoint(int xPos, int yPos, char symbol, int id) {
 		Coordinate coords = new Coordinate(xPos, yPos);
-		graph[size - 1 - coords.xPos][coords.yPos] = symbol;
+		graph[size - 1 - coords.getXPos()][coords.getXPos()] = symbol;
 		points.put(id, coords);
 	}
 
