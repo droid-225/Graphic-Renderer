@@ -1,5 +1,9 @@
 package GameEngine;
 
+import GameEngine.Entities.Obstacle;
+import GameEngine.Entities.Other;
+import GameEngine.Entities.Player;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
@@ -8,12 +12,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameWindow extends JPanel {
-    HashMap<Integer, Coordinate> players = new HashMap<>();
-    HashMap<Integer, Coordinate> others = new HashMap<>();
-    HashMap<Integer, Coordinate> Obstacle = new HashMap<>();
-    boolean isMoving = false;
+    private Player player = new Player(0, new Coordinate(1,1), 50, 50);
+    private HashMap<Integer, Other> others = new HashMap<>();
+    private HashMap<Integer, Obstacle> obstacle = new HashMap<>();
     final int MOVE_SPEED = 10;
     int width, height;
+    private boolean isMoving = false;
+    private final int GAME_SPEED = 50;
 
     public GameWindow(int width, int height) {
         this.width = width;
@@ -22,52 +27,72 @@ public class GameWindow extends JPanel {
         setPreferredSize(new Dimension(width, height));
         setFocusable(true);
 
-        addController(0);
+        others.put(0, new Other(1, new Coordinate(5, 5), 10, 10));
+        others.put(1, new Other(2, new Coordinate(20, 5), 10, 20));
+        others.put(2, new Other(3, new Coordinate(35, 5), 10, 30));
+        others.put(3, new Other(4, new Coordinate(50, 5), 10, 40));
+        //addController();
+        startMovement(others.get(0));
+        startMovement(others.get(1));
+        startMovement(others.get(2));
+        startMovement(others.get(3));
     }
 
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        int x, y, w, h = 0;
 
-        g.fillRect(players.get(0).getXPos(), players.get(0).getYPos(), 10, 10);
+        for(Map.Entry<Integer, Other> entry: others.entrySet()) {
+            x = entry.getValue().getPosition().getXPos();
+            y = entry.getValue().getPosition().getYPos();
+            w = entry.getValue().getWidth();
+            h = entry.getValue().getHeight();
+            g.fillRect(x, y, w, h);
+        }
+        //g.fillRect(player.getPosition().getXPos(), player.getPosition().getYPos(), player.getWidth(), player.getHeight());
+        //g.fillRect(players.get(0).getXPos(), players.get(0).getYPos(), 10, 10);
 
         //drawBoundingBox(g,new Coordinate(5, 5), 500, 500);
     }
 
-    public void addController(int entityID) {
+    public void startMovement(Other other) {
+        isMoving = true;
+        Thread movementThread = new Thread(() -> {
+            try {
+                while (isMoving && other.getPosition().getYPos() < (width - 10 - other.getHeight())) {
+                    SwingUtilities.invokeLater(() -> {
+                        other.setPosition(new Coordinate(other.getPosition().getXPos(), other.getPosition().getYPos() + MOVE_SPEED));
+                        repaint();
+                    });
+                    Thread.sleep(GAME_SPEED);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+        movementThread.start();
+    }
+
+    public void addController() {
         addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                Coordinate entity = players.get(entityID);
+                Coordinate entity = player.getPosition();
                 Coordinate newPos = switch (e.getKeyCode()) {
                     case KeyEvent.VK_LEFT -> new Coordinate(Math.max(0, entity.getXPos() - MOVE_SPEED), entity.getYPos());
-                    case KeyEvent.VK_RIGHT -> new Coordinate(Math.min(width - 10, entity.getXPos() + MOVE_SPEED), entity.getYPos());
+                    case KeyEvent.VK_RIGHT -> new Coordinate(Math.min(width - player.getWidth(), entity.getXPos() + MOVE_SPEED), entity.getYPos());
                     case KeyEvent.VK_UP -> new Coordinate(entity.getXPos(), Math.max(0, entity.getYPos() - MOVE_SPEED));
-                    case KeyEvent.VK_DOWN -> new Coordinate(entity.getXPos(), Math.min(height - 10, entity.getYPos() + MOVE_SPEED));
+                    case KeyEvent.VK_DOWN -> new Coordinate(entity.getXPos(), Math.min(height - player.getHeight(), entity.getYPos() + MOVE_SPEED));
                     default -> null;
                 };
 
                 if (newPos != null) {
-                    players.put(entityID, newPos);
-                    getPointData();
+                    player.setPosition(newPos);
                     repaint();
                 }
             }
         });
-    }
-
-    public void addPoint(int xPos, int yPos, int id) {
-        Coordinate coords = new Coordinate(xPos, yPos);
-        players.put(id, coords);
-    }
-
-    public void getPointData() {
-        for (Map.Entry<Integer, Coordinate> entry : players.entrySet()) {
-            Integer id = entry.getKey();
-            Coordinate coord = entry.getValue();
-
-            System.out.println("ID: " + id + "\tCoordinates: " + coord);
-        }
     }
 
     public void drawBoundingBox(Graphics g, Coordinate startCoords, int width, int height) {
@@ -75,23 +100,5 @@ public class GameWindow extends JPanel {
         g.fillRect(startCoords.getXPos(), startCoords.getYPos(), width, 1);
         g.fillRect(width + startCoords.getXPos(), startCoords.getYPos(), 1, height);
         g.fillRect(startCoords.getXPos(), height + startCoords.getYPos(), width, 1);
-    }
-
-    public void startMovement() {
-        isMoving = true;
-        Thread movementThread = new Thread(() -> {
-            try {
-                while (isMoving && players.get(0).getYPos() < 490) {
-                    SwingUtilities.invokeLater(() -> {
-                        players.put(0, new Coordinate(players.get(0).getXPos(), players.get(0).getYPos() + 10));
-                        repaint();
-                    });
-                    Thread.sleep(100);
-                }
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
-            }
-        });
-        movementThread.start();
     }
 }

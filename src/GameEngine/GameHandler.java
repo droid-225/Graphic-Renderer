@@ -8,8 +8,6 @@ public class GameHandler {
             JFrame frame = new JFrame("Game");
             GameWindow window = new GameWindow(510, 510);
 
-            window.addPoint(5, 5, 0);
-
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.getContentPane().add(window);
             frame.pack();
